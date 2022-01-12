@@ -1,4 +1,4 @@
-from project_name.data.make_dataset import dummy_sum
+from IUM21Z_Zad_05_03.data.make_dataset import dummy_sum
 
 
 def test_dummy_sum():
