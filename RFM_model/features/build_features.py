@@ -9,8 +9,6 @@ class FeatureBuilder:
         USERS_PATH = os.path.join(raw_path, "users.jsonl")
         PRODUCTS_PATH = os.path.join(raw_path, "products.jsonl")
 
-        self.raw_path = raw_path
-
         self.sess_df = self.load_data(SESSIONS_PATH)
         self.usr_df = self.load_data(USERS_PATH)
         self.prod_df = self.load_data(PRODUCTS_PATH)
