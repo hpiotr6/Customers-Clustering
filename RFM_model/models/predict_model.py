@@ -6,8 +6,8 @@ class Predictor:
     def __init__(self, model_name) -> None:
         self.model = self.load_model(model_name)
 
-    def load_model(self, filename):
-        path = os.path.join("../models", filename)
+    def load_model(self, filepath):
+        path = os.path.join(filepath, "my_model.pkl")
         loaded_model = pickle.load(open(path, 'rb'))
         return loaded_model
 
