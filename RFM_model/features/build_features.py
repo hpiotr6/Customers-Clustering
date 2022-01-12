@@ -4,17 +4,30 @@ import os
 
 
 class FeatureBuilder:
-    def __init__(self, raw_path) -> None:
+
+    def __init__(self, sessions, products, users) -> None:
+        self.sess_df = sessions
+        self.usr_df = users
+        self.prod_df = products
+
+    @classmethod
+    def from_files(cls, raw_path):
         SESSIONS_PATH = os.path.join(raw_path, "sessions.jsonl")
         USERS_PATH = os.path.join(raw_path, "users.jsonl")
         PRODUCTS_PATH = os.path.join(raw_path, "products.jsonl")
 
-        self.sess_df = self.load_data(SESSIONS_PATH)
-        self.usr_df = self.load_data(USERS_PATH)
-        self.prod_df = self.load_data(PRODUCTS_PATH)
+        sess_df = pd.read_json(path_or_buf=SESSIONS_PATH, lines=True)
+        usr_df = pd.read_json(path_or_buf=USERS_PATH, lines=True)
+        prod_df = pd.read_json(path_or_buf=PRODUCTS_PATH, lines=True)
 
-    def load_data(self, path: str) -> pd.DataFrame:
-        return pd.read_json(path_or_buf=path, lines=True)
+        return cls(sess_df, prod_df, usr_df)
+
+    @classmethod
+    def from_json(cls, sessions, users, products):
+        sess_df = pd.read_json(sessions)
+        usr_df = pd.read_json(users)
+        prod_df = pd.read_json(products)
+        return cls(sess_df, prod_df, usr_df)
 
     def merge_dataframes(self, sess_df, usr_df, prod_df):
         sess_df.dropna(subset=["user_id"], inplace=True)

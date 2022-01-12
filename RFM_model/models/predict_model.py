@@ -13,5 +13,6 @@ class Predictor:
 
     def predict(self, X):
         labels = self.model.predict(X)
-        result = X.assign(Cluster=labels)
+        clustered = X.assign(Cluster=labels)
+        result = clustered[clustered.Cluster == 0].user_id
         return result
