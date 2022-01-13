@@ -1,6 +1,8 @@
 from numpy import mod
+from pandas.core.frame import DataFrame
 from pandas.core.reshape.merge import merge
 from IUM21Z_Zad_05_03.features.build_features import FeaturesSimpleModel
+from IUM21Z_Zad_05_03.models.train_model import SimpleModelTrainer
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import os
@@ -12,8 +14,13 @@ class TestFeatures:
         assert type(model) == FeaturesSimpleModel
 
     def test_from_json(self):
+
+        sessions = "data/raw/sessions.jsonl"
+        users = "data/raw/users.jsonl"
+        products = "data/raw/products.jsonl"
+
         model = FeaturesSimpleModel.from_json(
-            "data/raw/sessions.jsonl", "data/raw/users.jsonl", "data/raw/products.jsonl")
+            sessions, users, products)
         assert type(model) == FeaturesSimpleModel
 
     def test_merge_dataframes_and_add_attributes_type(self):
@@ -39,9 +46,14 @@ class TestFeatures:
         model = FeaturesSimpleModel.from_files("data/raw")
         frame = model.merge_dataframes_and_add_attributes()
         minimal_frame = model.delete_attributes_except_amount(frame)
-        for column_name in ['is_male', 'recency', 'frequency', 'viewed_num', 'bought_num', 'bought/sum']:
-            assert column_name not in frame.columns
-        assert 'amount' not in frame.columns
+        # for column_name in ['recency']:
+        #     assert column_name not in minimal_frame.columns
+        print(minimal_frame.columns)
+        assert 'is_male' not in minimal_frame.columns
+        assert 'bought_num' not in minimal_frame.columns
+
+        assert 'amount' in minimal_frame.columns
+        assert len(frame.columns) == 2
 
     def test_delete_customers_with_below_10_items_bought(self):
         model = FeaturesSimpleModel.from_files("data/raw")
@@ -54,14 +66,15 @@ class TestFeatures:
 
         model.generate_processed_files_minimal(
             "E:\code\gitlab elka repo\ium-21z\data\processed")
-        frame = model.merge_dataframes_and_add_attributes()
-        merged = model.delete_attributes_except_amount(frame)
-        final_frame = model.delete_customers_with_below_10_items_bought(
-            merged)
-        test_path = os.path.join(
-            "E:\code\gitlab elka repo\ium-21z\data\processed", "processed.csv")
-        assert pd.read_json(path_or_buf=test_path, lines=True).size > 0
+        assert os.path.isfile("data/processed/processed.csv")
+        s1 = SimpleModelTrainer("data/processed/processed.csv")
+        assert len(s1.df.columns) == 2
 
-    def test_generate_processed_files_maximal(self, out_path):
+    def test_generate_processed_files_maximal(self):
         model = FeaturesSimpleModel.from_files("data/raw")
-        model.generate_processed_files_maximal("path")
+        model.generate_processed_files_maximal(
+            "E:\code\gitlab elka repo\ium-21z\data\processed")
+
+        assert os.path.isfile("data/processed/processed.csv")
+        s1 = SimpleModelTrainer("data/processed/processed.csv")
+        assert len(s1.df.columns) == 8

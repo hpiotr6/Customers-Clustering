@@ -85,28 +85,20 @@ class FeaturesSimpleModel:
         return customers
 
     def delete_attributes_except_amount(self, frame):
-        frame.drop(
-            columns=[
-                "is_male",
-                "viewed_num",
-                "bought/sum",
-                "recency",
-                "frequency",
-                "bought_num",
-            ],
-            axis=1,
-        )
+        frame = frame.drop(
+            columns=['is_male', 'viewed_num', 'bought/sum', 'frequency', 'recency', 'bought_num'], axis=1)
         return frame
 
     def delete_customers_with_below_10_items_bought(self, frame):
         return frame[frame["bought_num"] >= 10]
 
-    def generate_processed_files_minimal(self, out_path):
-        path = os.path.join(out_path, "processed.csv")
+    def generate_processed_files_minimal(self, out1_path):
+        path = os.path.join(out1_path, "processed.csv")
         merged = self.merge_dataframes_and_add_attributes()
-        merged = self.delete_attributes_except_amount(merged)
         final_frame = self.delete_customers_with_below_10_items_bought(merged)
-        final_frame.to_csv(path, index=False)
+
+        minimalistic_frame = self.delete_attributes_except_amount(final_frame)
+        minimalistic_frame.to_csv(path, index=False)
 
     def generate_processed_files_maximal(self, out_path):
         path = os.path.join(out_path, "processed.csv")
