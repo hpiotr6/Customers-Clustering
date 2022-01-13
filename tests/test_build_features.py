@@ -53,7 +53,7 @@ class TestFeatures:
         assert 'bought_num' not in minimal_frame.columns
 
         assert 'amount' in minimal_frame.columns
-        assert len(frame.columns) == 2
+        assert len(minimal_frame.columns) == 2
 
     def test_delete_customers_with_below_10_items_bought(self):
         model = FeaturesSimpleModel.from_files("data/raw")
@@ -64,10 +64,10 @@ class TestFeatures:
     def test_generate_processed_files_minimal(self):
         model = FeaturesSimpleModel.from_files("data/raw")
 
-        model.generate_processed_files_minimal(
+        model.generate_processed_files(
             "E:\code\gitlab elka repo\ium-21z\data\processed")
-        assert os.path.isfile("data/processed/processed.csv")
-        s1 = SimpleModelTrainer("data/processed/processed.csv")
+        assert os.path.isfile("data/processed/train/processed.csv")
+        s1 = SimpleModelTrainer("data/processed/train/processed.csv")
         assert len(s1.df.columns) == 2
 
     def test_generate_processed_files_maximal(self):

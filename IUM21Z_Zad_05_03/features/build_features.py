@@ -1,6 +1,9 @@
+from numpy.core.numeric import tensordot
 import pandas as pd
 from datetime import timedelta
 import os
+from sklearn.model_selection import train_test_split
+from pathlib import Path
 
 
 class FeaturesSimpleModel:
@@ -28,14 +31,34 @@ class FeaturesSimpleModel:
         prod_df = pd.read_json(products)
         return cls(sess_df, prod_df, usr_df)
 
-    def merge_dataframes_and_add_attributes(self):
+    def divide_into_train_test_sets(self, frame, test_ratio=0.3):
+        train, test = train_test_split(frame, test_size=test_ratio)
+        return train, test
+
+    def divide_data_into_old_and_new(self, sess_df):
+        max_date = pd.to_datetime(sess_df["timestamp"].max())
+        limit_day = max_date - timedelta(days=30)
+        sess_df_old = sess_df.loc[sess_df["timestamp"] < limit_day]
+        sess_df_last_month = sess_df.loc[sess_df["timestamp"] >= limit_day]
+        sess_df = sess_df_old
+        return sess_df_old, sess_df_last_month
+
+    def create_merge_table(self, old=True):
+        sess_old, sess_last_month = self.divide_data_into_old_and_new(
+            self.sess_df)
+        if old:
+            return self.merge_dataframes_and_add_attributes(sess_old)
+        return self.merge_dataframes_and_add_attributes(sess_last_month)
+
+    def merge_dataframes_and_add_attributes(self, sess_df):
         """
         Create Dataframe with many attibutes.It can be helpful when we want to change clustering attributes
         """
-        self.sess_df.product_id = self.sess_df.product_id.astype(
+
+        sess_df.product_id = sess_df.product_id.astype(
             pd.Int64Dtype())
-        self.sess_df.dropna(subset=["product_id"], inplace=True)
-        merged = self.sess_df.merge(self.prod_df).merge(self.usr_df)
+        sess_df.dropna(subset=["product_id"], inplace=True)
+        merged = sess_df.merge(self.prod_df).merge(self.usr_df)
         customers = (
             merged[["user_id", "price"]]
             .groupby("user_id")
@@ -92,16 +115,45 @@ class FeaturesSimpleModel:
     def delete_customers_with_below_10_items_bought(self, frame):
         return frame[frame["bought_num"] >= 10]
 
-    def generate_processed_files_minimal(self, out1_path):
-        path = os.path.join(out1_path, "processed.csv")
-        merged = self.merge_dataframes_and_add_attributes()
-        final_frame = self.delete_customers_with_below_10_items_bought(merged)
+    def generate_processed_files(self, out1_path, minimal=False):
 
-        minimalistic_frame = self.delete_attributes_except_amount(final_frame)
-        minimalistic_frame.to_csv(path, index=False)
+        old_dataframe = self.create_merge_table(old=True)
+        new_dataframe = self.create_merge_table(old=False)
+        # merged_test = self.merge_dataframes_and_add_attributes()
+        # merged_train = self.merge_dataframes_and_add_attributes()
 
-    def generate_processed_files_maximal(self, out_path):
-        path = os.path.join(out_path, "processed.csv")
-        merged = self.merge_dataframes_and_add_attributes()
-        final_frame = self.delete_customers_with_below_10_items_bought(merged)
-        final_frame.to_csv(path, index=False)
+        after_condition_frame_old = self.delete_customers_with_below_10_items_bought(
+            old_dataframe)
+
+        # final_frame_train = self.delete_customers_with_below_10_items_bought(merged_train)
+        # minimalistic_frame_test = self.delete_attributes_except_amount(final_frame_test)
+        if minimal:
+            after_condition_frame_new = self.delete_attributes_except_amount(
+                new_dataframe)
+            after_condition_frame_old = self.delete_attributes_except_amount(
+                after_condition_frame_old)
+
+        train_new, test_new = self.divide_into_train_test_sets(
+            new_dataframe, test_ratio=0.3)
+        train_old, test_old = self.divide_into_train_test_sets(
+            after_condition_frame_old, test_ratio=0.3)
+
+        path_test_new = os.path.join(out1_path, "test\\last_month.csv")
+        path_train_new = os.path.join(out1_path, "train\\last_month.csv")
+        path_test_old = os.path.join(out1_path, "test\\processed.csv")
+        path_train_old = os.path.join(out1_path, "train\\processed.csv")
+        Path(os.path.join(out1_path, "test")).mkdir(
+            parents=True, exist_ok=True)
+        Path(os.path.join(out1_path, "train")).mkdir(
+            parents=True, exist_ok=True)
+
+        test_new.to_csv(path_test_new, index=False)
+        train_new.to_csv(path_train_new, index=False)
+        test_old.to_csv(path_test_old, index=False)
+        train_old.to_csv(path_train_old, index=False)
+
+    # def generate_processed_files_maximal(self, out_path):
+    #     path = os.path.join(out_path, "processed.csv")
+    #     merged = self.merge_dataframes_and_add_attributes()
+    #     final_frame = self.delete_customers_with_below_10_items_bought(merged)
+    #     final_frame.to_csv(path, index=False)
