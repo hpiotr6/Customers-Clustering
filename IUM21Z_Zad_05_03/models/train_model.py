@@ -12,7 +12,10 @@ class SimpleModelTrainer:
         self.df = self.create_df(filepath)
         self.attribute = attribute
 
-    def get_cluster_number(self):
+    def create_df(self, filepath):
+        return pd.read_csv(filepath)
+
+    def get_clusters_number(self):
         Sum_of_squared_distances = []
 
         K = range(1, 11)
@@ -28,10 +31,10 @@ class SimpleModelTrainer:
         return kl.elbow
 
     def train_simple_model(self):
-        k = self.get_cluster_number()
+        k = self.get_clusters_number()
 
         kmeans = KMeans(n_clusters=k)
-        kmeans.fit(self.df[self.attribute])
+        kmeans.fit(self.df[[self.attribute]])
         return kmeans
 
     def train_save_simple_model(self, output_filepath):
