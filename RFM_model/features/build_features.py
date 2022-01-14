@@ -1,16 +1,18 @@
 from datetime import timedelta
 import pandas as pd
 import os
+from logs.logger import log
 
 
 class FeatureBuilder:
-
+    @log
     def __init__(self, sessions, products, users) -> None:
         self.sess_df = sessions
         self.usr_df = users
         self.prod_df = products
 
     @classmethod
+    @log
     def from_files(cls, raw_path):
         SESSIONS_PATH = os.path.join(raw_path, "sessions.jsonl")
         USERS_PATH = os.path.join(raw_path, "users.jsonl")
@@ -23,12 +25,14 @@ class FeatureBuilder:
         return cls(sess_df, prod_df, usr_df)
 
     @classmethod
+    @log
     def from_json(cls, sessions, users, products):
         sess_df = pd.read_json(sessions)
         usr_df = pd.read_json(users)
         prod_df = pd.read_json(products)
         return cls(sess_df, prod_df, usr_df)
 
+    @log
     def merge_dataframes(self, sess_df, usr_df, prod_df):
         sess_df.dropna(subset=["user_id"], inplace=True)
         sess_df.user_id = sess_df.user_id.astype(int)
@@ -37,6 +41,7 @@ class FeatureBuilder:
         merged = sess_df.merge(prod_df).merge(usr_df)
         return merged
 
+    @log
     def get_rfm(self, df):
         snapshot_date = max(df.timestamp) + timedelta(days=1)
         df_rfm = df[df.event_type == "BUY_PRODUCT"].groupby(['user_id'], as_index=False).agg({'timestamp': lambda x: (snapshot_date - x.max()).days,
@@ -46,11 +51,13 @@ class FeatureBuilder:
                                                                                                                                'price': 'MonetaryValue'})
         return df_rfm
 
+    @log
     def build(self):
         merged = self.merge_dataframes(self.sess_df, self.usr_df, self.prod_df)
         rfm = self.get_rfm(merged)
         return rfm
 
+    @log
     def build_save(self, output_path):
         rfm = self.build()
         path = os.path.join(output_path, "processed.csv")
