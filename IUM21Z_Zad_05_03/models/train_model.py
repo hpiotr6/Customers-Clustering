@@ -5,9 +5,11 @@ import pandas as pd
 from kneed import KneeLocator
 import os
 import pickle
+from logs.logger import log
 
 
 class SimpleModelTrainer:
+    @log
     def __init__(self, df=None, filepath=None, attribute='amount') -> None:
         if df == None:
             self.df = self.create_df(filepath)
@@ -15,9 +17,11 @@ class SimpleModelTrainer:
             self.df = df
         self.attribute = attribute
 
+    @log
     def create_df(self, filepath):
         return pd.read_csv(filepath)
 
+    @log
     def get_clusters_number(self):
         Sum_of_squared_distances = []
 
@@ -33,6 +37,7 @@ class SimpleModelTrainer:
         )
         return kl.elbow
 
+    @log
     def train_simple_model(self):
         k = self.get_clusters_number()
 
@@ -40,6 +45,7 @@ class SimpleModelTrainer:
         kmeans.fit(self.df[[self.attribute]])
         return kmeans
 
+    @log
     def train_save_simple_model(self, output_filepath):
         trained_model = self.train_simple_model()
         path = os.path.join(output_filepath, "simple_model.pkl")

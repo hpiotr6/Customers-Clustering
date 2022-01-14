@@ -1,18 +1,23 @@
+#!/usr/bin/env python
+
 from numpy.core.numeric import tensordot
 import pandas as pd
 from datetime import timedelta
 import os
 from sklearn.model_selection import train_test_split
 from pathlib import Path
+from logs.logger import log
 
 
 class FeaturesSimpleModel:
+    @log
     def __init__(self, sessions, products, users) -> None:
         self.sess_df = sessions
         self.usr_df = users
         self.prod_df = products
 
     @classmethod
+    @log
     def from_files(cls, raw_path):
         SESSIONS_PATH = os.path.join(raw_path, "sessions.jsonl")
         USERS_PATH = os.path.join(raw_path, "users.jsonl")
@@ -25,6 +30,7 @@ class FeaturesSimpleModel:
         return cls(sess_df, prod_df, usr_df)
 
     @classmethod
+    @log
     def from_json(cls, sessions, users, products):
         sess_df = pd.read_json(sessions)
         usr_df = pd.read_json(users)
@@ -35,6 +41,7 @@ class FeaturesSimpleModel:
         train, test = train_test_split(frame, test_size=test_ratio)
         return train, test
 
+    @log
     def divide_data_into_old_and_new(self, sess_df):
         max_date = pd.to_datetime(sess_df["timestamp"].max())
         limit_day = max_date - timedelta(days=30)
@@ -43,6 +50,7 @@ class FeaturesSimpleModel:
         sess_df = sess_df_old
         return sess_df_old, sess_df_last_month
 
+    @log
     def create_merge_table(self, old=True):
         sess_old, sess_last_month = self.divide_data_into_old_and_new(
             self.sess_df)
@@ -50,6 +58,7 @@ class FeaturesSimpleModel:
             return self.merge_dataframes_and_add_attributes(sess_old)
         return self.merge_dataframes_and_add_attributes(sess_last_month)
 
+    @log
     def merge_dataframes_and_add_attributes(self, sess_df):
         """
         Create Dataframe with many attibutes.It can be helpful when we want to change clustering attributes
@@ -107,14 +116,17 @@ class FeaturesSimpleModel:
 
         return customers
 
+    @log
     def delete_attributes_except_amount(self, frame):
         frame = frame.drop(
             columns=['is_male', 'viewed_num', 'bought/sum', 'frequency', 'recency', 'bought_num'], axis=1)
         return frame
 
+    @log
     def delete_customers_with_below_10_items_bought(self, frame):
         return frame[frame["bought_num"] >= 10]
 
+    @log
     def generate_processed_files(self, out1_path, minimal=False):
 
         old_dataframe = self.create_merge_table(old=True)
@@ -157,3 +169,10 @@ class FeaturesSimpleModel:
     #     merged = self.merge_dataframes_and_add_attributes()
     #     final_frame = self.delete_customers_with_below_10_items_bought(merged)
     #     final_frame.to_csv(path, index=False)
+
+
+if __name__ == '__main__':
+    model = FeaturesSimpleModel.from_files(
+        "E:/code/gitlab elka repo/ium-21z/data/raw")
+    model.generate_processed_files(
+        "E:/code/gitlab elka repo/ium-21z/data/processed")

@@ -41,6 +41,7 @@ class SimpleModelPredictor:
                 max_mean_spending = mean_spendings
         return best_group
 
+    @log
     def get_mean_spendings_of_group(self, cluster, df_old, df_new=None):
         user_ids_np = df_old["user_id"].to_numpy()
         unique_arr = np.unique(user_ids_np)
