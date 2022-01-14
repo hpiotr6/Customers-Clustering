@@ -1,4 +1,3 @@
-from RFM_model.features.build_features import FeatureBuilder
 import requests
 import pandas as pd
 import os
@@ -12,11 +11,7 @@ PRODUCTS_PATH = os.path.join(raw_path, "products.jsonl")
 sess_df = pd.read_json(path_or_buf=SESSIONS_PATH, lines=True)
 usr_df = pd.read_json(path_or_buf=USERS_PATH, lines=True)
 prod_df = pd.read_json(path_or_buf=PRODUCTS_PATH, lines=True)
-# new_measurement = {
-#     "sessions": sess_df.loc[0:3].to_json(),
-#     "products": prod_df.loc[0:3].to_json(),
-#     "users": usr_df.loc[0:3].to_json(),
-# }
+
 
 new_measurement = {
     "sessions": sess_df.to_json(),
@@ -24,5 +19,10 @@ new_measurement = {
     "users": usr_df.to_json(),
 }
 
-response = requests.post('http://127.0.0.1:8000/predict', json=new_measurement)
-print(response.content)
+# response = requests.post('http://127.0.0.1:8000/predict', json=new_measurement)
+# print(response.content)
+
+
+resp2 = requests.post(
+    'http://127.0.0.1:8000/predict_simple', json=new_measurement)
+print(resp2.content)

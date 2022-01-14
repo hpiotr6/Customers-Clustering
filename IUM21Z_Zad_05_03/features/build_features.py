@@ -150,10 +150,10 @@ class FeaturesSimpleModel:
         train_old, test_old = self.divide_into_train_test_sets(
             after_condition_frame_old, test_ratio=0.3)
 
-        path_test_new = os.path.join(out1_path, "test\\last_month.csv")
-        path_train_new = os.path.join(out1_path, "train\\last_month.csv")
-        path_test_old = os.path.join(out1_path, "test\\processed.csv")
-        path_train_old = os.path.join(out1_path, "train\\processed.csv")
+        path_test_new = os.path.join(out1_path, "test", "last_month.csv")
+        path_train_new = os.path.join(out1_path, "train", "last_month.csv")
+        path_test_old = os.path.join(out1_path, "test", "processed.csv")
+        path_train_old = os.path.join(out1_path, "train", "processed.csv")
         Path(os.path.join(out1_path, "test")).mkdir(
             parents=True, exist_ok=True)
         Path(os.path.join(out1_path, "train")).mkdir(
