@@ -481,6 +481,19 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "kneed"
+version = "0.7.0"
+description = "Knee-point detection in Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+matplotlib = "*"
+numpy = ">=1.14.2"
+scipy = "*"
+
+[[package]]
 name = "markupsafe"
 version = "2.0.1"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -1179,7 +1192,7 @@ notebook = ">=4.4.1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "e3fe1ec679683ecc5aa192425d50138e2d3e7bc4f4b40d87b558ca94c7c26490"
+content-hash = "c3f523943e02d1497622dcb4a077d835db7fa519075c82019680b1c3ba3515ac"
 
 [metadata.files]
 anyio = [
@@ -1456,6 +1469,10 @@ kiwisolver = [
     {file = "kiwisolver-1.3.2-pp37-pypy37_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:25405f88a37c5f5bcba01c6e350086d65e7465fd1caaf986333d2a045045a223"},
     {file = "kiwisolver-1.3.2-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:bcadb05c3d4794eb9eee1dddf1c24215c92fb7b55a80beae7a60530a91060560"},
     {file = "kiwisolver-1.3.2.tar.gz", hash = "sha256:fc4453705b81d03568d5b808ad8f09c77c47534f6ac2e72e733f9ca4714aa75c"},
+]
+kneed = [
+    {file = "kneed-0.7.0-py2.py3-none-any.whl", hash = "sha256:5a41c652a4f0c3d77c130c7fd7b1cd4f46d84752a70a461b5817c8eca938ee08"},
+    {file = "kneed-0.7.0.tar.gz", hash = "sha256:340d67fa183a72b0afae19846dd246a6fb7204e8d54243d8b8d3d9932f887c6e"},
 ]
 markupsafe = [
     {file = "MarkupSafe-2.0.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d8446c54dc28c01e5a2dbac5a25f071f6653e6e40f3a8818e8b45d790fe6ef53"},

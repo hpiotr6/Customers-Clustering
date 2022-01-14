@@ -13,29 +13,29 @@ class TestFeatures:
         model = FeaturesSimpleModel.from_files("data/raw")
         assert type(model) == FeaturesSimpleModel
 
-    def test_from_json(self):
+    # def test_from_json(self):
 
-        sessions = "data/raw/sessions.jsonl"
-        users = "data/raw/users.jsonl"
-        products = "data/raw/products.jsonl"
+    #     sessions = "data/raw/sessions.jsonl"
+    #     users = "data/raw/users.jsonl"
+    #     products = "data/raw/products.jsonl"
 
-        model = FeaturesSimpleModel.from_json(
-            sessions, users, products)
-        assert type(model) == FeaturesSimpleModel
+    #     model = FeaturesSimpleModel.from_json(
+    #         sessions, users, products)
+    #     assert type(model) == FeaturesSimpleModel
 
-    def test_merge_dataframes_and_add_attributes_type(self):
+    def test_create_merge_table(self):
         model = FeaturesSimpleModel.from_files("data/raw")
-        frame = model.merge_dataframes_and_add_attributes()
+        frame = model.create_merge_table(True)
         assert type(frame) == pd.DataFrame
 
-    def test_merge_dataframes_and_add_attributes_size(self):
+    def test_create_merge_table_size(self):
         model = FeaturesSimpleModel.from_files("data/raw")
-        frame = model.merge_dataframes_and_add_attributes()
+        frame = model.create_merge_table(True)
         assert frame.size > 400
 
     def test_merge_dataframes_and_add_attributes_check_if_attributes_exist(self):
         model = FeaturesSimpleModel.from_files("data/raw")
-        frame = model.merge_dataframes_and_add_attributes()
+        frame = model.create_merge_table(True)
         for column_name in ['is_male', 'amount', 'recency', 'frequency', 'viewed_num', 'bought_num', 'bought/sum']:
             if column_name in frame.columns:
                 assert True
@@ -44,7 +44,7 @@ class TestFeatures:
 
     def test_delete_attributes_except_amount(self):
         model = FeaturesSimpleModel.from_files("data/raw")
-        frame = model.merge_dataframes_and_add_attributes()
+        frame = model.create_merge_table(True)
         minimal_frame = model.delete_attributes_except_amount(frame)
         # for column_name in ['recency']:
         #     assert column_name not in minimal_frame.columns
@@ -57,24 +57,22 @@ class TestFeatures:
 
     def test_delete_customers_with_below_10_items_bought(self):
         model = FeaturesSimpleModel.from_files("data/raw")
-        frame = model.merge_dataframes_and_add_attributes()
+        frame = model.create_merge_table(True)
         frame = model.delete_customers_with_below_10_items_bought(frame)
         assert frame['viewed_num'].min() >= 10
 
-    def test_generate_processed_files_minimal(self):
-        model = FeaturesSimpleModel.from_files("data/raw")
+    # def test_generate_processed_files_minimal(self):
+    #     model = FeaturesSimpleModel.from_files("data/raw")
 
+    #     model.generate_processed_files(
+    #         "E:\code\gitlab elka repo\ium-21z\data\processed")
+    #     assert os.path.isfile("data/processed/train/processed.csv")
+    #     # s1 = SimpleModelTrainer("data/processed/train/processed.csv")
+    #     assert len(s1.df.columns) == 2
+
+    def test_generate_processed_files(self):
+        model = FeaturesSimpleModel.from_files("data/raw")
         model.generate_processed_files(
             "E:\code\gitlab elka repo\ium-21z\data\processed")
+
         assert os.path.isfile("data/processed/train/processed.csv")
-        s1 = SimpleModelTrainer("data/processed/train/processed.csv")
-        assert len(s1.df.columns) == 2
-
-    def test_generate_processed_files_maximal(self):
-        model = FeaturesSimpleModel.from_files("data/raw")
-        model.generate_processed_files_maximal(
-            "E:\code\gitlab elka repo\ium-21z\data\processed")
-
-        assert os.path.isfile("data/processed/processed.csv")
-        s1 = SimpleModelTrainer("data/processed/processed.csv")
-        assert len(s1.df.columns) == 8

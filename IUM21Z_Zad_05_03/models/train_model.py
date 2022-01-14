@@ -8,8 +8,11 @@ import pickle
 
 
 class SimpleModelTrainer:
-    def __init__(self, filepath, attribute='amount') -> None:
-        self.df = self.create_df(filepath)
+    def __init__(self, df=None, filepath=None, attribute='amount') -> None:
+        if df == None:
+            self.df = self.create_df(filepath)
+        else:
+            self.df = df
         self.attribute = attribute
 
     def create_df(self, filepath):
