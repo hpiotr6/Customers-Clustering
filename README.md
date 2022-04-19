@@ -3,7 +3,7 @@
 Project is the solution for eCommerce business assignment.
 Having been given users, sessions, deliveries and products frames, we have to deal with the following business problem:
 
-'We do have additional benefits for our best customers, but maybe it would be possible to find out who is potentially willing to spend more with us?' 
+> We do have additional benefits for our best customers, but maybe it would be possible to find out who is potentially willing to spend more with us?
 
 Project covers:
 * Explanatory data analysis
@@ -35,3 +35,6 @@ uvicorn main:app --reload
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
+
+
+
