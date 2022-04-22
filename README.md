@@ -13,6 +13,9 @@ Project covers:
 
 More information was reported in the polish language [here](https://github.com/hpiotr6/Customers-Clustering/blob/main/notebooks/etap2/etap2.ipynb).
 
+* **Python libraries used:** pandas, sklearn, seaborn, log, click, pickle, numpy, fastapi, pydantic, pytest
+* **Input:** users, sessions, deliveries and products frames
+* **Output:** best clients group
 
 
 ## Installation
